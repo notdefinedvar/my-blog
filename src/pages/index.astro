@@ -1,0 +1,62 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const recentPosts = posts
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 5);
+---
+
+<Layout title="Home">
+  <section>
+    <h1>Welcome</h1>
+    <p>This is my personal website where I share my projects and thoughts.</p>
+  </section>
+
+  <section>
+    <h2>Recent Posts</h2>
+    {recentPosts.length === 0 ? (
+      <p>No posts yet.</p>
+    ) : (
+      <ul>
+        {recentPosts.map((post) => (
+          <li>
+            <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+            <span class="date">
+              {post.data.pubDate.toLocaleDateString()}
+            </span>
+          </li>
+        ))}
+      </ul>
+    )}
+    <a href="/blog">View all posts →</a>
+  </section>
+
+  <section>
+    <h2>Projects</h2>
+    <p>Check out my <a href="/projects">projects</a>.</p>
+  </section>
+</Layout>
+
+<style>
+  section {
+    margin-bottom: 3rem;
+  }
+
+  ul {
+    list-style: none;
+  }
+
+  li {
+    margin: 0.75rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .date {
+    color: #666;
+    font-size: 0.9rem;
+  }
+</style>
