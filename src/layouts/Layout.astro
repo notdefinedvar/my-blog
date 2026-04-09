@@ -1,4 +1,6 @@
 ---
+import '../styles/global.css';
+
 interface Props {
   title: string;
   description?: string;
@@ -34,28 +36,7 @@ const { title, description = 'A personal website' } = Astro.props;
   </body>
 </html>
 
-<style is:global>
-  :root {
-    --color-bg: #ffffff;
-    --color-text: #333333;
-    --color-primary: #0066cc;
-    --color-border: #e0e0e0;
-  }
-
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-      Ubuntu, Cantarell, sans-serif;
-    line-height: 1.6;
-    color: var(--color-text);
-    background-color: var(--color-bg);
-  }
-
+<style>
   header {
     border-bottom: 1px solid var(--color-border);
     padding: 1rem 2rem;
@@ -89,44 +70,5 @@ const { title, description = 'A personal website' } = Astro.props;
     padding: 2rem;
     text-align: center;
     color: #666;
-  }
-
-  a {
-    color: var(--color-primary);
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    margin: 1.5rem 0 1rem;
-    line-height: 1.2;
-  }
-
-  p {
-    margin: 1rem 0;
-  }
-
-  code {
-    background: #f4f4f4;
-    padding: 0.2rem 0.4rem;
-    border-radius: 3px;
-    font-family: 'Fira Code', Consolas, monospace;
-    font-size: 0.9em;
-  }
-
-  pre {
-    background: #f4f4f4;
-    padding: 1rem;
-    border-radius: 6px;
-    overflow-x: auto;
-    margin: 1rem 0;
-  }
-
-  pre code {
-    background: none;
-    padding: 0;
   }
 </style>
