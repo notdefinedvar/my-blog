@@ -149,4 +149,9 @@ function main() {
   console.log(output);
 }
 
-main();
+export { generateTwitterFormat, parseFrontmatter, stripMarkdown, splitIntoThreadPosts };
+
+const isMainModule = process.argv[1] === __filename;
+if (isMainModule) {
+  main();
+}

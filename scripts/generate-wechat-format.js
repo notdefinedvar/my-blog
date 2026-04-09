@@ -52,11 +52,11 @@ function convertMarkdownToWeChatHTML(markdown) {
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
 
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
   html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (match, lang, code) => {
     return `<pre><code>${code.trim()}</code></pre>`;
   });
+
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
   html = html.replace(/\[([^\]]+)\]\([^)]+\)/g, '<a href="$2">$1</a>');
 
@@ -122,8 +122,13 @@ function generateWeChatFormat(filePath) {
   const pubDate = data.pubDate
     ? new Date(data.pubDate).toLocaleDateString('zh-CN')
     : new Date().toLocaleDateString('zh-CN');
+  const tags = Array.isArray(data.tags) ? data.tags : [];
 
   const articleHTML = convertMarkdownToWeChatHTML(body);
+
+  const tagsHtml = tags.length > 0
+    ? `<p style="color:#999;font-size:0.9em;">${tags.map((tag) => `#${tag}`).join(' ')}</p>`
+    : '';
 
   const output = `<!DOCTYPE html>
 <html>
@@ -135,6 +140,7 @@ function generateWeChatFormat(filePath) {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; line-height: 1.8; color: #333; max-width: 100%; padding: 0 15px; box-sizing: border-box;">
   <h1 style="font-size: 1.5em; text-align: center; margin: 30px 0;">${title}</h1>
   <p style="text-align: center; color: #999; font-size: 0.9em;">${author} | ${pubDate}</p>
+  ${tagsHtml}
   <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
   ${articleHTML}
   <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
@@ -164,4 +170,9 @@ function main() {
   console.log(output);
 }
 
-main();
+export { generateWeChatFormat, parseFrontmatter, convertMarkdownToWeChatHTML };
+
+const isMainModule = process.argv[1] === __filename;
+if (isMainModule) {
+  main();
+}
