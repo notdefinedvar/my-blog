@@ -9,7 +9,6 @@ const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 
 const TWITTER_CHAR_LIMIT = 280;
-const THREAD_NUMBER_OFFSET = 6;
 
 function parseFrontmatter(content) {
   const frontmatterRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
