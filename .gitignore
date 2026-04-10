@@ -26,3 +26,7 @@ npm-debug.log*
 # Git
 # Keep .gitignore itself
 !.gitignore
+
+# Test results
+test-results/
+playwright-report/
