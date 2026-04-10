@@ -59,7 +59,8 @@ function convertMarkdownToWeChatHTML(markdown) {
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
-    return `<a href="${url}">${text}</a>`;
+    const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    return `<a href="${escape(url)}">${escape(text)}</a>`;
   });
 
   html = html.replace(/!\[([^\]]*)\]\([^)]+\)/g, '<p style="color: #666; font-size: 0.9em;">[Image: $1 - upload manually to WeChat]</p>');

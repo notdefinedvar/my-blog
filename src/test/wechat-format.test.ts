@@ -80,6 +80,18 @@ console.log('hello');
     expect(output).toContain("console.log('hello')");
   });
 
+  it('converts links safely', async () => {
+    const filePath = writeTempMd(`---
+title: Links
+description: Desc
+pubDate: 2024-01-01
+---
+Check [this <site>](https://example.com?a=1&b=2).`);
+    const { generateWeChatFormat } = await import('../../scripts/generate-wechat-format.js');
+    const output = generateWeChatFormat(filePath);
+    expect(output).toContain('<a href="https://example.com?a=1&amp;b=2">this &lt;site&gt;</a>');
+  });
+
   it('renders tags', async () => {
     const filePath = writeTempMd(`---
 title: Tags
