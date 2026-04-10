@@ -5,6 +5,9 @@ node_modules/
 dist/
 .astro/
 
+# Astro generated
+src/env.d.ts
+
 # OS files
 .DS_Store
 Thumbs.db
