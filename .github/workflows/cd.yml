@@ -39,13 +39,15 @@ jobs:
         id: changed
         run: |
           CHANGED_FILES=$(git diff --name-only HEAD~1 -- 'src/content/blog/*.md')
-          echo "changed_files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Generate Twitter formats
         if: steps.changed.outputs.changed_files != ''
         run: |
           mkdir -p artifacts/twitter
-          for file in ${{ steps.changed.outputs.changed_files }}; do
+          echo "${{ steps.changed.outputs.changed_files }}" | while IFS= read -r file; do
             filename=$(basename "$file" .md)
             node scripts/generate-twitter-format.js "$file" > "artifacts/twitter/${filename}.txt"
           done
@@ -54,7 +56,7 @@ jobs:
         if: steps.changed.outputs.changed_files != ''
         run: |
           mkdir -p artifacts/wechat
-          for file in ${{ steps.changed.outputs.changed_files }}; do
+          echo "${{ steps.changed.outputs.changed_files }}" | while IFS= read -r file; do
             filename=$(basename "$file" .md)
             node scripts/generate-wechat-format.js "$file" > "artifacts/wechat/${filename}.html"
           done
