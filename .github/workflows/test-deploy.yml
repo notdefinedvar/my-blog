@@ -1,10 +1,10 @@
 name: Test & Deploy
 
-# Runs on PR merge to main
 on:
   pull_request:
     branches: [main]
     types: [closed]
+  workflow_dispatch:
 
 permissions:
   contents: read
