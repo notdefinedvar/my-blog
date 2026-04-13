@@ -4,7 +4,6 @@ on:
   pull_request:
     branches: [main]
     types: [closed]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -17,40 +16,56 @@ concurrency:
 
 jobs:
   test-deploy:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
+      - name: Check if PR was merged
+        id: check-merge
+        run: |
+          if [[ "${{ github.event.pull_request.merged }}" != "true" ]]; then
+            echo "PR was not merged, skipping deploy steps"
+            echo "skipped=true" >> $GITHUB_OUTPUT
+          else
+            echo "skipped=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout
+        if: steps.check-merge.outputs.skipped != 'true'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Node
+        if: steps.check-merge.outputs.skipped != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
+        if: steps.check-merge.outputs.skipped != 'true'
         run: npm install
 
       - name: Type check
+        if: steps.check-merge.outputs.skipped != 'true'
         run: npm run check
 
       - name: Build
+        if: steps.check-merge.outputs.skipped != 'true'
         run: npm run build
 
       - name: Unit tests
+        if: steps.check-merge.outputs.skipped != 'true'
         run: npm test
 
       - name: Get changed blog posts
+        if: steps.check-merge.outputs.skipped != 'true'
         id: changed
         run: |
           CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD -- 'src/content/blog/*.md')
           echo "changed_files=$CHANGED_FILES" >> $GITHUB_OUTPUT
 
       - name: Generate Twitter formats
-        if: steps.changed.outputs.changed_files != ''
+        if: steps.check-merge.outputs.skipped != 'true' && steps.changed.outputs.changed_files != ''
         run: |
           mkdir -p artifacts/twitter
           for file in ${{ steps.changed.outputs.changed_files }}; do
@@ -59,7 +74,7 @@ jobs:
           done
 
       - name: Generate WeChat formats
-        if: steps.changed.outputs.changed_files != ''
+        if: steps.check-merge.outputs.skipped != 'true' && steps.changed.outputs.changed_files != ''
         run: |
           mkdir -p artifacts/wechat
           for file in ${{ steps.changed.outputs.changed_files }}; do
@@ -68,7 +83,7 @@ jobs:
           done
 
       - name: Upload Twitter artifacts
-        if: steps.changed.outputs.changed_files != ''
+        if: steps.check-merge.outputs.skipped != 'true' && steps.changed.outputs.changed_files != ''
         uses: actions/upload-artifact@v4
         with:
           name: twitter-formats
@@ -76,7 +91,7 @@ jobs:
           retention-days: 30
 
       - name: Upload WeChat artifacts
-        if: steps.changed.outputs.changed_files != ''
+        if: steps.check-merge.outputs.skipped != 'true' && steps.changed.outputs.changed_files != ''
         uses: actions/upload-artifact@v4
         with:
           name: wechat-formats
@@ -84,4 +99,5 @@ jobs:
           retention-days: 30
 
       - name: Deploy to GitHub Pages
+        if: steps.check-merge.outputs.skipped != 'true'
         uses: actions/deploy-pages@v4
