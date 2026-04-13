@@ -1,0 +1,74 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+  <article>
+    <header>
+      <h1>{post.data.title}</h1>
+      <div class="meta">
+        <time datetime={post.data.pubDate.toISOString()}>
+          {post.data.pubDate.toLocaleDateString()}
+        </time>
+        <span class="author">{post.data.author}</span>
+      </div>
+      {post.data.tags.length > 0 && (
+        <div class="tags">
+          {post.data.tags.map((tag) => (
+            <span class="tag">#{tag}</span>
+          ))}
+        </div>
+      )}
+    </header>
+    <div class="content">
+      <Content />
+    </div>
+  </article>
+</Layout>
+
+<style>
+  header {
+    margin-bottom: 2rem;
+  }
+
+  h1 {
+    margin: 0 0 1rem;
+  }
+
+  .meta {
+    display: flex;
+    gap: 1rem;
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .tags {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .tag {
+    background: #f0f0f0;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  .content {
+    line-height: 1.8;
+  }
+</style>

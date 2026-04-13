@@ -1,0 +1,74 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'A personal website' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/blog">Blog</a>
+        <a href="/projects">Projects</a>
+        <a href="/about">About</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <p>&copy; {new Date().getFullYear()}. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
+
+<style>
+  header {
+    border-bottom: 1px solid var(--color-border);
+    padding: 1rem 2rem;
+  }
+
+  nav {
+    display: flex;
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  nav a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--color-primary);
+  }
+
+  main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    min-height: calc(100vh - 200px);
+  }
+
+  footer {
+    border-top: 1px solid var(--color-border);
+    padding: 2rem;
+    text-align: center;
+    color: #666;
+  }
+</style>

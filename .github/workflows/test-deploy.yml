@@ -1,0 +1,86 @@
+name: Test & Deploy
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  test-deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run check
+
+      - name: Build
+        run: npm run build
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Get changed blog posts
+        id: changed
+        run: |
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD -- 'src/content/blog/*.md')
+          echo "changed_files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+
+      - name: Generate Twitter formats
+        if: steps.changed.outputs.changed_files != ''
+        run: |
+          mkdir -p artifacts/twitter
+          for file in ${{ steps.changed.outputs.changed_files }}; do
+            filename=$(basename "$file" .md)
+            node scripts/generate-twitter-format.js "$file" > "artifacts/twitter/${filename}.txt"
+          done
+
+      - name: Generate WeChat formats
+        if: steps.changed.outputs.changed_files != ''
+        run: |
+          mkdir -p artifacts/wechat
+          for file in ${{ steps.changed.outputs.changed_files }}; do
+            filename=$(basename "$file" .md)
+            node scripts/generate-wechat-format.js "$file" > "artifacts/wechat/${filename}.html"
+          done
+
+      - name: Upload Twitter artifacts
+        if: steps.changed.outputs.changed_files != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: twitter-formats
+          path: artifacts/twitter/
+          retention-days: 30
+
+      - name: Upload WeChat artifacts
+        if: steps.changed.outputs.changed_files != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: wechat-formats
+          path: artifacts/wechat/
+          retention-days: 30
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
