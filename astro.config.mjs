@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://cjg.github.io',
+  site: 'https://notdefinedvar.github.io',
   base: '/',
   integrations: [],
   markdown: {
