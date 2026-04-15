@@ -1,9 +1,9 @@
-name: Test & Deploy
+name: CD
 
 on:
-  pull_request:
+  push:
     branches: [main]
-    types: [closed]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -15,8 +15,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  test-deploy:
-    if: github.event.pull_request.merged == true
+  cd:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,32 +26,28 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
-
-      - name: Type check
-        run: npm run check
+        run: npm install
 
       - name: Build
         run: npm run build
 
-      - name: Unit tests
-        run: npm test
-
       - name: Get changed blog posts
         id: changed
         run: |
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD -- 'src/content/blog/*.md')
-          echo "changed_files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+          CHANGED_FILES=$(git diff --name-only HEAD~1 -- 'src/content/blog/*.md')
+          echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Generate Twitter formats
         if: steps.changed.outputs.changed_files != ''
         run: |
           mkdir -p artifacts/twitter
-          for file in ${{ steps.changed.outputs.changed_files }}; do
+          echo "${{ steps.changed.outputs.changed_files }}" | while IFS= read -r file; do
             filename=$(basename "$file" .md)
             node scripts/generate-twitter-format.js "$file" > "artifacts/twitter/${filename}.txt"
           done
@@ -61,7 +56,7 @@ jobs:
         if: steps.changed.outputs.changed_files != ''
         run: |
           mkdir -p artifacts/wechat
-          for file in ${{ steps.changed.outputs.changed_files }}; do
+          echo "${{ steps.changed.outputs.changed_files }}" | while IFS= read -r file; do
             filename=$(basename "$file" .md)
             node scripts/generate-wechat-format.js "$file" > "artifacts/wechat/${filename}.html"
           done

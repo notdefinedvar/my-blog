@@ -30,6 +30,9 @@ npm-debug.log*
 # Keep .gitignore itself
 !.gitignore
 
+# Git worktrees
+.worktrees/
+
 # Test results
 test-results/
 playwright-report/
