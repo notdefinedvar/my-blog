@@ -1,8 +1,8 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://cjg.github.io',
-  base: '/',
+  site: 'https://notdefinedvar.github.io/my-blog',
+  base: '/my-blog',
   integrations: [],
   markdown: {
     shikiConfig: {
