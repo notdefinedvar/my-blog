@@ -2,10 +2,10 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Smoke tests', () => {
   const pages = [
-    { path: '/', name: 'Home' },
-    { path: '/blog', name: 'Blog' },
-    { path: '/projects', name: 'Projects' },
-    { path: '/about', name: 'About' },
+    { path: '/my-blog/', name: 'Home' },
+    { path: '/my-blog/blog', name: 'Blog' },
+    { path: '/my-blog/projects', name: 'Projects' },
+    { path: '/my-blog/about', name: 'About' },
   ];
 
   for (const page of pages) {
