@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
+const base = import.meta.env.BASE_URL;
 const posts = await getCollection('blog', ({ data }) => !data.draft);
 const recentPosts = posts
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
@@ -22,7 +23,7 @@ const recentPosts = posts
       <ul>
         {recentPosts.map((post) => (
           <li>
-            <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+            <a href={`${base}/blog/${post.slug}`}>{post.data.title}</a>
             <span class="date">
               {post.data.pubDate.toLocaleDateString()}
             </span>
@@ -30,12 +31,12 @@ const recentPosts = posts
         ))}
       </ul>
     )}
-    <a href="/blog">View all posts →</a>
+    <a href={`${base}/blog`}>View all posts →</a>
   </section>
 
   <section>
     <h2>Projects</h2>
-    <p>Check out my <a href="/projects">projects</a>.</p>
+    <p>Check out my <a href={`${base}/projects`}>projects</a>.</p>
   </section>
 </Layout>
 
