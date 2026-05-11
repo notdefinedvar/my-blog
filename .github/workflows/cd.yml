@@ -41,6 +41,8 @@ jobs:
         id: changed
         run: |
           CHANGED_FILES=$(git diff --name-only HEAD~1 -- 'src/content/blog/*.md')
+          # Decode URL-encoded paths (git diff uses percent-encoding for non-ASCII filenames)
+          CHANGED_FILES=$(echo "$CHANGED_FILES" | python3 -c 'import sys,urllib.parse;print(urllib.parse.unquote(sys.stdin.read()))')
           echo "changed_files<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
